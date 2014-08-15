@@ -1,0 +1,22 @@
+TestCase:
+    base class for (AioTestCase, SioTestCase, ...)
+    It contains: 
+                data: store the test result
+                virtual bool run(): run the test case
+                void printStatus(): print the test result
+
+AioCase: public TestCase
+    base class for all asynchronous test case
+    It contains:
+                void start_io(...) to start an asynchronous io
+                rbd_bencher_completion() to deal result after an asynchronous io ends
+
+AioWriteCase: public AioCase
+    useable class for all asynchronous write io.
+    It needs parameters such as: io_size, io_bytes, io_threads, io_pattern
+   
+Bench:
+    The main class for bench-architecture
+    It contains:
+        int registerTestCase(...): register test case
+        run(): to run all test case 
