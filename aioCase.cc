@@ -48,17 +48,18 @@ void rbd_bencher_completion(void *vc, void *pc)
     }
 
     b->lock.Lock();
-    b->data.cur_latency = end_time - b->start_time[c];
-    b->data.history.latency.push_back(b->data.cur_latency);
-    b->data.total_latency += b->data.cur_latency;
-    if( b->data.cur_latency > b->data.max_latency) b->data.max_latency = b->data.cur_latency;
-    if (b->data.cur_latency < b->data.min_latency) b->data.min_latency = b->data.cur_latency;
-    ++(b->data.finished);
-    b->data.avg_latency = b->data.total_latency / b->data.finished;
+    bench_data *data = &b->data;
+    data->cur_latency = end_time - b->start_time[c];
+    data->history.latency.push_back(data->cur_latency);
+    data->total_latency += data->cur_latency;
+    if( data->cur_latency > data->max_latency) data->max_latency = data->cur_latency;
+    if (data->cur_latency < data->min_latency) data->min_latency = data->cur_latency;
+    ++(data->finished);
+    data->avg_latency = data->total_latency / data->finished;
     //clear the map 
     b->start_time.erase(mit); 
     
-    b->data.in_flight--;
+    data->in_flight--;
     b->cond.Signal();
     b->lock.Unlock();
     c->release();
