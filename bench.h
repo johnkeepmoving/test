@@ -19,15 +19,15 @@
 #define BENCH_H
 
 #include "testCase.h"
+#include "aioWriteCase.h"
 
-CephContext *g_ceph_context = NULL;
-md_config_t *g_conf =NULL;
+//CephContext *g_ceph_context = NULL;
+//md_config_t *g_conf =NULL;
 
 class Bench {
     public:
-        //get single instance
-        static Bench* getInstance(const char *user_name, const char *cluster_name);
 
+        Bench(const char *user_name, const char *cluster_name, const char *poolName, const char* imageName);
         //destructor can be called from outside 
         ~Bench();
         
@@ -36,7 +36,6 @@ class Bench {
         //exeucte all test case 
         int run();
         TestCase* currTestCase;
-        static Bench* benchInstance; 
         
         librados::Rados cluster;
         librados::IoCtx io_ctx;
@@ -53,11 +52,6 @@ class Bench {
         int numFailed;
 
     private:
-        //constructor is not allowed called from outside
-        Bench(const char *user_name, const char *cluster_name);
-        
         std::vector<TestCase*> caseSet;
-        
-        //ceph cluster info
 };
 #endif

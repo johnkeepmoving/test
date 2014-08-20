@@ -1,5 +1,5 @@
-# -I /path/to/ceph/src/
-bench: bench.cc testCase.cc aioCase.cc aioWriteCase.cc 
-	g++ bench.cc testCase.cc aioCase.cc aioWriteCase.cc -lrados -lrbd -I /home/jh/programming/ceph/src/ -o bench
+CEPH_HOME = /home/jh/programming/ceph/src/
+rbdBench: rbdBench.cc operate_config.cc bench.cc aioWriteCase.cc aioCase.cc testCase.cc 
+	g++ -g rbdBench.cc  operate_config.cc bench.cc aioWriteCase.cc aioCase.cc testCase.cc -lrados -lrbd -I $(CEPH_HOME)  -o rbdBench
 clean:
-	rm bench 
+	rm rbdBench 

@@ -18,10 +18,11 @@
 
 #include "bench.h"
 
-#include "aioWriteCase.h"
-Bench::Bench(const char *user_name, const char *cluster_name) {
+Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name) {
     clusterName = cluster_name;
     userName = user_name;
+    poolName = pool_name;
+    imageName = image_name;
     uint64_t flags = 0;
     int ret;
     /* Initialize the cluster hadnle */
@@ -58,7 +59,6 @@ Bench::Bench(const char *user_name, const char *cluster_name) {
         }
     }
     
-    poolName = "PoolTest";
     /* Create pool */
     {
         ret = cluster.pool_lookup(poolName);
@@ -89,9 +89,25 @@ Bench::Bench(const char *user_name, const char *cluster_name) {
                 << " !" << std::endl;
         }
     }
-    imageName = "ImageTest";
-    rbd.open(io_ctx, image, imageName);
-    std::cout << "rbd open image:"<<imageName <<" succeed!" << std::endl;
+    /* Open an image, if not exist, create it! */
+    { 
+        ret = rbd.open(io_ctx, image, imageName);
+        if (ret < 0) {
+            uint64_t image_size = 102400000;
+            int order = 0;
+            ret = rbd.create(io_ctx, imageName, image_size, &order);
+            if (ret < 0) {
+                std::cout << "create image error!" << std::endl;
+                exit(1);
+            }
+            ret = rbd.open(io_ctx, image, imageName);
+            if (ret < 0) {
+                std::cout << "open new image error!" << std::endl;
+                exit(1);
+            }
+        }
+        std::cout << "rbd open image:"<<imageName <<" succeed!" << std::endl;
+    }
 }
 Bench:: ~Bench() {
     int ret;
@@ -101,16 +117,6 @@ Bench:: ~Bench() {
         ret = EXIT_FAILURE;
     }
     cluster.shutdown();
-}
-Bench* Bench::benchInstance = (Bench *) 0;
-
-Bench* Bench::getInstance(const char *user_name, const char *cluster_name) {
-    if (benchInstance != NULL)
-        return benchInstance;
-
-    //get a Bench instance
-    benchInstance = new Bench(user_name, cluster_name);
-    return benchInstance;
 }
 
 int Bench::registerTestCase(TestCase *pTestCase) {
@@ -148,6 +154,7 @@ int Bench::run() {
     std::cout<< "Failure: "<< numFailed << std::endl;
 }
 
+/*
 int main(int argc, const char *argv[])
 {
     const char *user_name = "client.admin";
@@ -180,3 +187,4 @@ int main(int argc, const char *argv[])
     free(benchInstance);
     return 0;
 }
+*/
