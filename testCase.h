@@ -60,6 +60,7 @@ struct bench_data {
   double min_latency;
   double max_latency;
   double avg_latency;
+  double variance_latency;
   double total_latency;
   //struct bench_interval_data idata; // data that is updated by time intervals and not by events
   struct bench_history history; // data history, used to calculate stddev
@@ -73,6 +74,7 @@ struct bench_data {
       min_latency = 9999.0;
       max_latency = 0;
       avg_latency = 0;
+      variance_latency = 0;
   };
 };
 

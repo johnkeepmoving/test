@@ -25,6 +25,7 @@ void TestCase::printStatus() {
     std::cout << "    min_latency: " << data.min_latency << std::endl;
     std::cout << "    max_latency: " << data.max_latency << std::endl;
     std::cout << "    avg_latency: " << data.avg_latency << std::endl;
+    std::cout << "    variance_latency: " << data.variance_latency << std::endl;
     std::cout << "starte_ops: " << data.started<< std::endl; 
     std::cout << "finished_ops: " << data.finished << std::endl; 
     std::cout << "in_flight_ops: " << data.in_flight<< std::endl; 

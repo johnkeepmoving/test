@@ -50,12 +50,14 @@ void rbd_bencher_completion(void *vc, void *pc)
     b->lock.Lock();
     bench_data *data = &b->data;
     data->cur_latency = end_time - b->start_time[c];
-    data->history.latency.push_back(data->cur_latency);
+    double delta = data->cur_latency - data->avg_latency;
+    //data->history.latency.push_back(data->cur_latency);
     data->total_latency += data->cur_latency;
     if( data->cur_latency > data->max_latency) data->max_latency = data->cur_latency;
     if (data->cur_latency < data->min_latency) data->min_latency = data->cur_latency;
     ++(data->finished);
     data->avg_latency = data->total_latency / data->finished;
+    data->variance_latency += delta * (data->cur_latency - data->avg_latency); 
     //clear the map 
     b->start_time.erase(mit); 
     

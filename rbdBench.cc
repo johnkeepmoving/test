@@ -104,7 +104,6 @@ void rbdBench_run (std::map<std::string, std::string> &options, std::vector<cons
     } else {
         std::stringstream ss(i->second);
         ss >> io_threads;
-        std::cout << "in ss, io_threads: " << io_threads << std::endl;
     }
     
     i = options.find("io_total");
@@ -114,7 +113,6 @@ void rbdBench_run (std::map<std::string, std::string> &options, std::vector<cons
     } else {
         std::stringstream ss(i->second);
         ss >> io_total;
-        std::cout << "in ss, io_total: " << io_total << std::endl;
     }
 
     bool filter_seq;
@@ -173,25 +171,20 @@ int main(int argc, const char *argv[])
 
     std::vector<const char *> :: iterator i; 
     for(i=args.begin(); i<args.end(); ) {
-        std::cout << "argv: " << *i << std::endl;
         if (ceph_argparse_flag(args, i, "-h", "--help", (char *)NULL)) {
             usage(cout);
             exit(0);
         } else if (ceph_argparse_witharg(args, i, &val, 
                     "--conf", (char *)NULL)) {
-            std::cout << "conf: " << val << std::endl;
             options["conf"] = val;
         } else if (ceph_argparse_witharg(args, i, &val,
                     "--filter", (char *)NULL)) {
-            std::cout << "filter: " << val << std::endl;
             options["filter"] = val;
         } else if (ceph_argparse_witharg(args, i, &val,
                     "--io_threads", (char *)NULL)) {
-            std::cout << "io_threads: " << val << std::endl;
             options["io_threads"] = val;
         } else if (ceph_argparse_witharg(args, i, &val,
                     "--io_total", (char *)NULL)) {
-            std::cout << "io_total: " << val << std::endl;
             options["io_total"] = val;
         } else {
             if (val[0] != '-') {
