@@ -23,6 +23,8 @@
 #include <sstream>
 #include <string>
 #include "bench.h"
+#include "aioWriteCase.h" 
+#include "aioReadCase.h" 
 
 //void usage(ostream &out);
 //void argv_to_vec(int argc, const char *argv[], std::vector<const char *> &args);
@@ -31,13 +33,12 @@
 
 //void rbdBench_run (std::map<std::string, std::string> &options, std::vector<const char*> &args);
 
-CephContext *g_ceph_context = NULL;
-md_config_t *g_conf =NULL;
+//CephContext *g_ceph_context = NULL;
+//md_config_t *g_conf =NULL;
 class RbdBench : public Bench {
     public:
-        RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name):
-            Bench(user_name, cluster_name, pool_name, image_name)
-        {};
+        RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name);
+        ~RbdBench();
 };
 
 #endif

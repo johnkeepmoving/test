@@ -28,6 +28,11 @@ typedef int (librbd::Image:: *ptrIOFunc) (uint64_t off, size_t len, bufferlist& 
 
 class AioCase: public TestCase {
 public:
+    uint64_t io_size;
+    uint64_t io_threads;
+    uint64_t io_bytes;
+    string pattern;
+    bool write;//determin if it's write or read
     //data is in TestCase
     librbd::Image *image;
     Mutex lock;
@@ -38,14 +43,10 @@ public:
     //may point to librbd::Image::aio_write() or 
     //             librbd::Image::aio_read()   
     ptrIOFunc aio_function;
-    AioCase(string caseName, librbd::Image *pImage, ptrIOFunc aioFunction)
-        :TestCase(caseName), image(pImage),
-        aio_function(aioFunction),
-        lock("AioCase::lock")
-    {
-    }
-    
+    AioCase(string caseName, bool ioWrite, uint64_t ioSize, uint64_t ioThreads, uint64_t ioBytes, string ioPattern, librbd::Image *pImage, ptrIOFunc aioFunction);
+    ~AioCase();
     void wait_for(int max);
     bool start_io(int max, uint64_t off, uint64_t len, bufferlist& bl);
+    bool run();
 };
 #endif

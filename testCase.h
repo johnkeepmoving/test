@@ -80,8 +80,9 @@ struct bench_data {
 
 class TestCase {
     public:
+        ~TestCase();
         bench_data data;
-        TestCase(string caseName): case_name(caseName) ,case_result(false){}
+        TestCase(string caseName);
         //virtual bool run(librados::Rados &cluster, librados::IoCtx &io_ctx, librbd::RBD &rbd, librbd::Image &image);
         virtual bool run(){}
         bool case_result;

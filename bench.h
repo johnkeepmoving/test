@@ -19,7 +19,8 @@
 #define BENCH_H
 
 #include "testCase.h"
-#include "aioWriteCase.h"
+//#include "aioWriteCase.h"
+//#include "aioReadCase.h" 
 
 //CephContext *g_ceph_context = NULL;
 //md_config_t *g_conf =NULL;
@@ -35,7 +36,6 @@ class Bench {
         int registerTestCase(TestCase *pTestCase);
         //exeucte all test case 
         int run();
-        TestCase* currTestCase;
         
         librados::Rados cluster;
         librados::IoCtx io_ctx;

@@ -108,15 +108,41 @@ Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_n
         }
         std::cout << "rbd open image:"<<imageName <<" succeed!" << std::endl;
     }
+    std::cout << "Construct Bench" << std::endl;
 }
 Bench:: ~Bench() {
+    /*
     int ret;
+    ret = image.flush();
+    if (ret < 0) {
+        cout << "flush image error!" << std::endl;
+        exit(1);
+    }
+    //delete the image
+    ret = rbd.remove(io_ctx, imageName);
+     
+    if (ret < 0) {
+        cout << "rbd remove the image failed!" << std::endl;
+        exit(1);
+    }
+    ret = io_ctx.aio_flush();
+    if (ret < 0) {
+        cout << "flush io_ctx aio error!" << std::endl;
+        exit(1);
+    }
+    io_ctx.close();
+    cout << "close the io_ctx" << std::endl;
     ret = cluster.pool_delete(poolName);
+
     if (ret < 0) {
         cerr << "Failed to delete our test pool" << std::endl;
         ret = EXIT_FAILURE;
     }
+     
     cluster.shutdown();
+    cout << "close the cluster" << std::endl;
+    */
+    std::cout << "Destruct Bench" << std::endl;
 }
 
 int Bench::registerTestCase(TestCase *pTestCase) {
@@ -126,13 +152,14 @@ int Bench::registerTestCase(TestCase *pTestCase) {
 }
 
 int Bench::run() {
+    TestCase* currTestCase;
     //run every test case
     vector<TestCase*> :: iterator caseIte;
     for(caseIte= caseSet.begin(); caseIte != caseSet.end(); caseIte++) {
         //TestCase* testCase = *it; 
         currTestCase = *caseIte;
         std::cout<< "==========================================" << std::endl;
-        std::cout<< "Run TestCase: " << currTestCase->case_name.c_str() << std::endl;
+        std::cout<< "Run TestCase: " << currTestCase->case_name << std::endl;
         //currTestCase->run(cluster, io_ctx, rbd, image); 
         currTestCase->run(); 
         std::cout<< "End TestCase: " << currTestCase->case_name.c_str() << std::endl;

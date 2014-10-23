@@ -6,7 +6,7 @@
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  08/14/2014 01:50:24 PM
+ *        Created:  10/23/2014 10:34:24 AM
  *       Revision:  none
  *       Compiler:  g++
  *
@@ -15,13 +15,13 @@
  *
  * =====================================================================================
  */
-#ifndef AIO_WRITE_CASE_H
-#define AIO_WRITE_CASE_H
+#ifndef AIO_READ_CASE_H
+#define AIO_READ_CASE_H
 
 #include "aioCase.h" 
-class AioWriteCase: public AioCase {
+class AioReadCase: public AioCase {
 public:
-    AioWriteCase(string caseName, librbd::Image *pImage, uint64_t ioSize, uint64_t ioThreads, uint64_t ioBytes, string ioPattern);
-    ~AioWriteCase();
+    AioReadCase(string caseName, librbd::Image *pImage, uint64_t ioSize, uint64_t ioThreads, uint64_t ioBytes, string ioPattern);
+    ~AioReadCase();
 };
 #endif
