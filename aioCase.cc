@@ -21,11 +21,11 @@ AioCase :: AioCase(string caseName, bool ioWrite, uint64_t ioSize, uint64_t ioTh
         uint64_t ioBytes, string ioPattern, librbd::Image *pImage, ptrIOFunc aioFunction) 
     :TestCase(caseName), write(ioWrite), io_size(ioSize), io_threads(ioThreads), io_bytes(ioBytes), pattern(ioPattern), 
     image(pImage), aio_function(aioFunction), lock("AioCase::lock") {
-        cout << "Construct AioCase" << std::endl;
+        //cout << "Construct AioCase" << std::endl;
 }
 
 AioCase :: ~AioCase() {
-    cout << "Destcut AioCase" << std::endl;
+    //cout << "Destcut AioCase" << std::endl;
 } 
 
 void AioCase::wait_for(int max) {
@@ -76,7 +76,7 @@ void rbd_bencher_completion(void *vc, void *pc)
     if (data->cur_latency < data->min_latency) data->min_latency = data->cur_latency;
     ++(data->finished);
     data->avg_latency = data->total_latency / data->finished;
-    data->variance_latency += delta * (data->cur_latency - data->avg_latency); 
+    data->variance_latency += (delta * (data->cur_latency - data->avg_latency)); 
     //clear the map 
     b->start_time.erase(mit); 
     

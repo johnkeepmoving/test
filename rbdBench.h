@@ -37,7 +37,7 @@
 //md_config_t *g_conf =NULL;
 class RbdBench : public Bench {
     public:
-        RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name);
+        RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name, string json_name);
         ~RbdBench();
 };
 

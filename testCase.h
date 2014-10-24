@@ -72,15 +72,15 @@ struct bench_data {
       finished = 0;
       in_flight = 0;
       min_latency = 9999.0;
-      max_latency = 0;
-      avg_latency = 0;
-      variance_latency = 0;
+      max_latency = 0.0;
+      avg_latency = 0.0;
+      variance_latency = 0.0;
   };
 };
 
 class TestCase {
     public:
-        ~TestCase();
+        virtual ~TestCase();
         bench_data data;
         TestCase(string caseName);
         //virtual bool run(librados::Rados &cluster, librados::IoCtx &io_ctx, librbd::RBD &rbd, librbd::Image &image);

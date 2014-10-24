@@ -17,8 +17,14 @@
  */
 
 #include "bench.h"
+#include "json/json.h"
+#include <iostream>
+#include <fstream>
 
-Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name) {
+Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name, string json_name) {
+    json_file_name = json_name;
+    numPassed = 0;
+    numFailed = 0;
     clusterName = cluster_name;
     userName = user_name;
     poolName = pool_name;
@@ -142,6 +148,8 @@ Bench:: ~Bench() {
     cluster.shutdown();
     cout << "close the cluster" << std::endl;
     */
+    for(int i=0; i<caseSet.size(); i++)
+        delete caseSet[i];
     std::cout << "Destruct Bench" << std::endl;
 }
 
@@ -152,7 +160,10 @@ int Bench::registerTestCase(TestCase *pTestCase) {
 }
 
 int Bench::run() {
+    Json::Value root;
     TestCase* currTestCase;
+    ofstream file;
+    file.open(json_file_name.c_str());
     //run every test case
     vector<TestCase*> :: iterator caseIte;
     for(caseIte= caseSet.begin(); caseIte != caseSet.end(); caseIte++) {
@@ -167,18 +178,42 @@ int Bench::run() {
         if (currTestCase->case_result) {
             //success
             numPassed++;
+            cout << "Result: Succeed" << std::endl;
         }
         else {
             //failure
             numFailed++;
+            cout << "Result: Failed" << std::endl;
         }
+        bench_data *ptr_data = &(currTestCase->data);
+
+        //write data to json object, 
+        Json::Value latency;
+        Json::Value testCase;
+        
+        testCase["CaseName"] = currTestCase->case_name  ;
+        testCase["total time"] = (double) (ptr_data->end_time - ptr_data->start_time); 
+        latency["total_latency"] = ptr_data->total_latency;
+        latency["min_latency"] = ptr_data->min_latency;
+        latency["max_latency"] = ptr_data->max_latency;
+        latency["variance_latency"] = ptr_data->variance_latency;
+        testCase["latency"] = latency;
+
+        root[currTestCase->case_name] = testCase; 
+        root.toStyledString();
+        //cout << root.toStyledString() << std::endl;
     }
-    
+     
     //print total case status 
     std::cout<< "==========================================" << std::endl;
     std::cout<< "Total test case: "<< numPassed+numFailed << std::endl;
     std::cout<< "Success: "<< numPassed << std::endl;
     std::cout<< "Failure: "<< numFailed << std::endl;
+    //write all json object to json file!
+    file << root.toStyledString() << std::endl; 
+    file.close();
+
+    //cout << root.toStyledString() << std::endl;
 }
 
 /*

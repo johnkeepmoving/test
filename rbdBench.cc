@@ -18,11 +18,40 @@
 #include "rbdBench.h" 
 #include <common/ceph_argparse.h>
 #include "operate_config.h" 
+#include "yaml-cpp/yaml.h" 
 //#include "global/global_init.h"
 //#include "global/global_context.h" 
 
-RbdBench :: RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name):
-    Bench(user_name, cluster_name, pool_name, image_name) {
+struct RbdCase {
+    string case_name;
+    bool asynchronous;//yes or no
+    bool write;//write or read
+    bool rand;//rand or seq
+    unsigned int io_size;
+    unsigned int io_total;
+    unsigned int io_threads;
+};
+
+vector<RbdCase> phrase_rbdCase (string rbdCase_filename) {
+    vector<RbdCase> caseSet;
+    RbdCase currCase;
+    YAML::Node config = YAML::LoadFile(rbdCase_filename);
+    cout << "Read rbdCase file Succeed" << std::endl;
+    for(int i=0; i<config.size(); i++) {
+        currCase.case_name = config[i]["name"].as<string>(); 
+        currCase.asynchronous = config[i]["asynchronous"].as<bool>(); 
+        currCase.write = config[i]["write"].as<bool>(); 
+        currCase.rand = config[i]["rand"].as<bool>(); 
+        currCase.io_size = config[i]["io_size"].as<unsigned int>(); 
+        currCase.io_total = config[i]["io_total"].as<unsigned int>(); 
+        currCase.io_threads = config[i]["io_threads"].as<unsigned int>();
+        caseSet.push_back(currCase);
+    }
+    return caseSet;
+}
+
+RbdBench :: RbdBench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name, string json_name):
+    Bench(user_name, cluster_name, pool_name, image_name, json_name) {
         std::cout << "Construct RbdBench" << std::endl;
     };
 RbdBench :: ~RbdBench() {
@@ -99,29 +128,16 @@ void rbdBench_run (std::map<std::string, std::string> &options, std::vector<cons
     } else {
         image_name = i->second.c_str();
     }
-
+    string _json_file_name;
+    i = options.find("json-file");
+    if (i == options.end()) {
+        _json_file_name = "default.json";
+    } else {
+        _json_file_name = i->second;
+    }
     //construct rbdBench object
-    RbdBench rbdBench(user_name.c_str(), cluster_name.c_str(), pool_name.c_str(), image_name.c_str());
-
-    //
-    i = options.find("io_threads");
-    uint64_t io_threads;
-    if (i == options.end()) {
-        io_threads = 16;
-    } else {
-        std::stringstream ss(i->second);
-        ss >> io_threads;
-    }
-    
-    i = options.find("io_total");
-    uint64_t io_total;
-    if (i == options.end()) {
-        io_total = 102400000; //100M
-    } else {
-        std::stringstream ss(i->second);
-        ss >> io_total;
-    }
-
+    RbdBench rbdBench(user_name.c_str(), cluster_name.c_str(), pool_name.c_str(), image_name.c_str(), _json_file_name);
+    librbd::Image *image = &(rbdBench.image);
     bool filter_seq, filter_rand;
     string filter_pattern;
     i = options.find("filter-rs");
@@ -152,54 +168,29 @@ void rbdBench_run (std::map<std::string, std::string> &options, std::vector<cons
         else if (filter_pattern == "write")
             filter_write = true;
     }
-
-    //below construct the write case 
-    string seqPattern = "seq";
-    string randPattern = "rand";
-
-    librbd::Image *image = &(rbdBench.image);
-    //aio write case
-    AioWriteCase aw4kseq(string("aw4kseq"), image, 4096, io_threads, io_total, seqPattern);
-    AioWriteCase aw4krand(string("aw4krand"), image, 4096, io_threads, io_total, randPattern);
     
-    AioWriteCase aw8kseq(string("aw8kseq"), image, 8192, io_threads, io_total, seqPattern);
-    AioWriteCase aw8krand(string("aw8krand"), image, 8192, io_threads, io_total, randPattern);
-    
-    AioWriteCase aw16kseq(string("aw16kseq"), image, 16384, io_threads, io_total, seqPattern);
-    AioWriteCase aw16krand(string("aw16krand"), image, 16384, io_threads, io_total, randPattern);
-
-    //aio read case
-    AioReadCase ar4kseq(string("ar4kseq"), image, 4096, io_threads, io_total, seqPattern);
-    AioReadCase ar4krand(string("ar4krand"), image, 4096, io_threads, io_total, randPattern);
-    
-    AioReadCase ar8kseq(string("ar8kseq"), image, 8192, io_threads, io_total, seqPattern);
-    AioReadCase ar8krand(string("ar8krand"), image, 8192, io_threads, io_total, randPattern);
-    
-    AioReadCase ar16kseq(string("ar16kseq"), image, 16384, io_threads, io_total, seqPattern);
-    AioReadCase ar16krand(string("ar16krand"), image, 16384, io_threads, io_total, randPattern);
-
-    if (filter_rand) {
-        if (filter_write) {
-            rbdBench.registerTestCase(&aw4krand); 
-            rbdBench.registerTestCase(&aw8krand); 
-            rbdBench.registerTestCase(&aw16krand); 
-        }
-        if (filter_read) {
-            rbdBench.registerTestCase(&ar4krand); 
-            rbdBench.registerTestCase(&ar8krand); 
-            rbdBench.registerTestCase(&ar16krand); 
-        }
+    i = options.find("case-file");
+    if (i == options.end()) {
+        cout << "Need to specify RbdCase file!" << std::endl;
+        exit(1);
     }
-    if (filter_seq) {
-        if (filter_write) {
-            rbdBench.registerTestCase(&aw4kseq); 
-            rbdBench.registerTestCase(&aw8kseq); 
-            rbdBench.registerTestCase(&aw16kseq);
-        }
-        if (filter_read) {
-            rbdBench.registerTestCase(&ar4kseq); 
-            rbdBench.registerTestCase(&ar8kseq); 
-            rbdBench.registerTestCase(&ar16kseq);
+    string rbdCase_filename = i->second;
+    vector<RbdCase> caseSet = phrase_rbdCase(rbdCase_filename);
+    //register test case
+    cout << "Total case: " << caseSet.size() << std::endl;
+    for(int i=0; i<caseSet.size(); i++) {
+        string io_pattern = caseSet[i].rand? "rand":"seq";
+        if (caseSet[i].asynchronous) {
+           if (caseSet[i].write) {
+               AioWriteCase *curr = new AioWriteCase(caseSet[i].case_name, image, (uint64_t)caseSet[i].io_size, 
+                      (uint64_t)caseSet[i].io_threads, (uint64_t)caseSet[i].io_total, io_pattern);
+               rbdBench.registerTestCase(curr); 
+           } else {
+               AioReadCase *curr = new AioReadCase(caseSet[i].case_name, image, (uint64_t)caseSet[i].io_size, 
+                      (uint64_t)caseSet[i].io_threads, (uint64_t)caseSet[i].io_total, io_pattern);
+               rbdBench.registerTestCase(curr); 
+           }
+        } else {
         }
     }
     rbdBench.run();
@@ -232,11 +223,19 @@ int main(int argc, const char *argv[])
                     "--filter-rs", (char *)NULL)) {
             options["filter-rs"] = val;
         } else if (ceph_argparse_witharg(args, i, &val,
+                    "--case-file", (char *)NULL)) {
+            options["case-file"] = val;
+        } else if (ceph_argparse_witharg(args, i, &val,
+                    "--json-file", (char *)NULL)) {
+            options["json-file"] = val;
+        /*
+        } else if (ceph_argparse_witharg(args, i, &val,
                     "--io_threads", (char *)NULL)) {
             options["io_threads"] = val;
         } else if (ceph_argparse_witharg(args, i, &val,
                     "--io_total", (char *)NULL)) {
             options["io_total"] = val;
+        */
         } else {
             if (val[0] != '-') {
                 usage(cout);

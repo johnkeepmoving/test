@@ -19,10 +19,11 @@
 
 TestCase :: TestCase(string caseName): 
     case_name(caseName) ,case_result(false) {
-    std::cout << "Construct TestCase() " << std::endl;
+    data = bench_data();
+    //std::cout << "Construct TestCase() " << std::endl;
 }
 TestCase :: ~TestCase() {
-    std::cout << "Destrcut TestCase() " << std::endl;
+    //std::cout << "Destrcut TestCase() " << std::endl;
 }
 
 void TestCase::printStatus() {

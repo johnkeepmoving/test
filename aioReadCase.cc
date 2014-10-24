@@ -18,9 +18,9 @@
 #include "aioReadCase.h" 
 AioReadCase :: AioReadCase(string caseName, librbd::Image *pImage, uint64_t ioSize, uint64_t ioThreads, uint64_t ioBytes, string ioPattern)
     :AioCase(caseName, false, ioSize, ioThreads, ioBytes, ioPattern, pImage, &librbd::Image::aio_read) {
-        cout << "Construct AioReadCase" << std::endl;
+        //cout << "Construct AioReadCase" << std::endl;
 }
 
 AioReadCase :: ~AioReadCase() {
-    cout << "Destruct AioReadCase" << std::endl; 
+    //cout << "Destruct AioReadCase" << std::endl; 
 }

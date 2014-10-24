@@ -28,7 +28,7 @@
 class Bench {
     public:
 
-        Bench(const char *user_name, const char *cluster_name, const char *poolName, const char* imageName);
+        Bench(const char *user_name, const char *cluster_name, const char *poolName, const char* imageName, string json_name);
         //destructor can be called from outside 
         ~Bench();
         
@@ -50,8 +50,7 @@ class Bench {
         int totalResult;
         int numPassed;
         int numFailed;
-
-    private:
+        string json_file_name;
         std::vector<TestCase*> caseSet;
 };
 #endif
