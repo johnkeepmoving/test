@@ -99,7 +99,7 @@ Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_n
     { 
         ret = rbd.open(io_ctx, image, imageName);
         if (ret < 0) {
-            uint64_t image_size = 102400000;
+            uint64_t image_size = 1024000000;
             int order = 0;
             ret = rbd.create(io_ctx, imageName, image_size, &order);
             if (ret < 0) {
@@ -196,6 +196,7 @@ int Bench::run() {
         latency["total_latency"] = ptr_data->total_latency;
         latency["min_latency"] = ptr_data->min_latency;
         latency["max_latency"] = ptr_data->max_latency;
+        latency["avg_latency"] = ptr_data->avg_latency;
         latency["variance_latency"] = ptr_data->variance_latency;
         testCase["latency"] = latency;
 

@@ -1,0 +1,47 @@
+ - name: aw4krand
+   asynchronous: true
+   write: true
+   rand: true
+   io_size: 4096 
+   io_total: 40960000
+   io_threads: 16
+ 
+ - name: aw8krand
+   asynchronous: true
+   write: true
+   rand: true
+   io_size: 8192 
+   io_total: 40960000
+   io_threads: 16
+ 
+ - name: aw16krand
+   asynchronous: true
+   write: true
+   rand: true
+   io_size: 16384 
+   io_total: 40960000
+   io_threads: 16
+ 
+ - name: ar4krand
+   asynchronous: true
+   write: false 
+   rand: true
+   io_size: 4096 
+   io_total: 40960000
+   io_threads: 16
+
+ - name: ar8krand
+   asynchronous: true
+   write: false 
+   rand: true
+   io_size: 8192 
+   io_total: 40960000
+   io_threads: 16
+ 
+ - name: ar16krand
+   asynchronous: true
+   write: false 
+   rand: true
+   io_size: 16384 
+   io_total: 40960000
+   io_threads: 16

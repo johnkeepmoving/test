@@ -62,6 +62,11 @@ RbdBench :: ~RbdBench() {
 void usage(ostream &out) {
     out << 
 "usage: rbdBench [options] [commands]\n"
+"     --conf path/to/file, specify the basic ceph config file(should contain cluster name ...)\n"
+"     --filter-rw  read or write, just run the case which satisfy the rule\n"
+"     --filter-rs  rand or seq, just run the case which satisfy the rule\n"
+"     --case-file  path/to/case file which should read from, the case file should be in yaml format\n"
+"     --json-file  path/to/json file which should write result to, the case file would be in json format\n"
 "     \n"
 ;
     //need to add more
@@ -87,19 +92,20 @@ void rbdBench_run (std::map<std::string, std::string> &options, std::vector<cons
     std::map<std::string, std::string> :: const_iterator i; 
     //read bench conf
     string bench_conf_name;
-    i = options.find("conf");
-    if (i == options.end()) {
-        std::cout << "Error! Must specify the bench conf!" << std::endl;
-        exit(1);
-    }
-    bench_conf_name = i->second;
     string user_name;
     string cluster_name;
     string pool_name;
     string image_name;
     std::map<std::string, std::string> conf_args;
-    //read from conf 
-    read_conf(bench_conf_name, conf_args);
+
+    i = options.find("conf");
+    if (i == options.end()) {
+        std::cout << "Use the default bench conf!" << std::endl;
+    } else {
+	bench_conf_name = i->second;
+	//read from conf 
+	read_conf(bench_conf_name, conf_args);
+    }
 
     i = conf_args.find("user_name");
     if (i == conf_args.end()) {

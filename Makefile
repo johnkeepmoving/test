@@ -1,9 +1,15 @@
-CEPH_HOME = /home/jh/programming/ceph/src/
-JSON_INCLUDE = /home/jh/jsoncpp-src-0.5.0/include
-JSON_LIB = /home/jh/jsoncpp-src-0.5.0/libs/linux-gcc-4.6
-JSON_LIB_USED = json_linux-gcc-4.6_libmt
+CEPH_HOME = /root/work/ceph/src/
+RADOS_LIB = /root/work/ceph/src/.libs/librados.so
+RBD_LIB = /root/work/ceph/src/.libs/librbd.so
+JSON_INCLUDE = /root/work/jsoncpp-src-0.5.0/include
+JSON_LIB = /root/work/jsoncpp-src-0.5.0/libs/linux-gcc-4.4.7/libjson_linux-gcc-4.4.7_libmt.so
 
-rbdBench: rbdBench.cc operate_config.cc bench.cc aioWriteCase.cc aioReadCase.cc aioCase.cc testCase.cc 
-	g++ -g rbdBench.cc  operate_config.cc bench.cc aioWriteCase.cc aioReadCase.cc aioCase.cc testCase.cc -I$(CEPH_HOME) -I$(JSON_INCLUDE) -L$(JSON_LIB) -l$(JSON_LIB_USED) -lrados -lrbd -lyaml-cpp -o rbdBench
+%.o:%.cc
+	gcc -g -c $^ -o $@ -I$(CEPH_HOME) -I$(JSON_INCLUDE)
+
+rbdBench: rbdBench.o operate_config.o bench.o aioWriteCase.o aioReadCase.o aioCase.o testCase.o
+	g++ -g -o $@ $^ $(JSON_LIB) $(RADOS_LIB) $(RBD_LIB) -lyaml-cpp
 clean:
-	rm rbdBench 
+	rm -f *.o
+	rm -f rbdBench 
+
