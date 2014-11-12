@@ -1,22 +1,31 @@
+Classes introduction:
+
 TestCase:
-    base class for (AioTestCase, SioTestCase, ...)
+    base class for (AioTestCase,...)
     It contains: 
                 data: store the test result
-                virtual bool run(): run the test case
                 void printStatus(): print the test result
 
 AioCase: public TestCase
     base class for all asynchronous test case
     It contains:
-                void start_io(...) to start an asynchronous io
-                rbd_bencher_completion() to deal result after an asynchronous io ends
+                run() to execute a test case
+                virtual void start_io(...) to start an asynchronous io
 
 AioWriteCase: public AioCase
-    useable class for all asynchronous write io.
-    It needs parameters such as: io_size, io_bytes, io_threads, io_pattern
-   
+                aio_write_completion() to deal result after an asynchronous write io ends
+                implement start_io() 
+
+AioReadCase: public AioCase
+                aio_read_completion() to deal result after an asynchronous read io ends
+                implement start_io() 
 Bench:
-    The main class for bench-architecture
+    It stores base info of the ceph cluster, pool name, image name, rados object, ioctx object, rbd object...
     It contains:
         int registerTestCase(...): register test case
-        run(): to run all test case 
+        run(): to run all test case
+
+RbdBench:
+   main program
+   It read from rbd.testCase.in, and parse the parameter of test case and filter rule.
+   finally run all test case one by one 

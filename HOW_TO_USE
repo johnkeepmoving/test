@@ -1,0 +1,12 @@
+1. install the prerequisite
+   see Prerequisite.
+2. set ceph path and json path in Makefile
+
+3. make
+4. before run rbdBench, check that:
+   ldd rbdBench,
+   if can't find the librados.so and librbd.so
+      export LD_LIBRARY_PATH=/path/to/ceph/src/.libs/
+5. ./rbdBench  --case-file input_test_case.yaml --json-file output.result
+   for more info:
+       run ./rbdBench -h

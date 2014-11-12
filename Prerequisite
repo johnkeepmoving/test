@@ -1,0 +1,27 @@
+1. install yaml-cpp
+   download yaml-cpp from https://code.google.com/p/yaml-cpp/downloads/detail?name=yaml-cpp-0.5.1.tar.gz
+   install accroding to 'install.txt' 
+   
+   you may have below problem on Centos 6.5:
+   ```
+   The imported target "boost_date_time-static" references the file
+
+     "/usr/lib64/lib64/libboost_date_time.a"
+   but this file does not exist. 
+   ```
+   just run"cmake .. -DBoost_NO_BOOST_CMAKE=ON"
+
+scon is needed by jscon, so we should install scon first
+
+2. install scon
+   download scons from http://www.scons.org/
+   tar -zxvf scons-2.0.1.tar.gz
+   set env
+   export MYSCONS= /path/to/scon/
+   export SCONS_LIB_DIR=$MYSCONS/engine 
+
+3. install jscon
+   download from http://sourceforge.net/projects/jsoncpp/
+   tar zxvf jsoncpp-src-0.5.0.tar.gz 
+   cd jsoncpp-src-0.5.0
+   python $MYSCONS/script/scons platform=linux-gcc 
