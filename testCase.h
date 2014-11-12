@@ -24,7 +24,7 @@
 
 #include <common/config.h>
 #include <common/Cond.h>
-#include <common/ceph_context.h>
+//#include <common/ceph_context.h>
 
 #include <string>
 #include <iostream>
