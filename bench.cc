@@ -20,7 +20,7 @@
 #include "json/json.h"
 #include <iostream>
 #include <fstream>
-
+using std::ofstream;
 Bench::Bench(const char *user_name, const char *cluster_name, const char *pool_name, const char *image_name, string json_name) {
     json_file_name = json_name;
     numPassed = 0;
@@ -191,8 +191,9 @@ int Bench::run() {
         Json::Value latency;
         Json::Value testCase;
         
-        testCase["CaseName"] = currTestCase->case_name  ;
-        testCase["total time"] = (double) (ptr_data->end_time - ptr_data->start_time); 
+        testCase["CaseName"] = currTestCase->case_name;
+        testCase["Time measure:"] = " ms";
+        testCase["total time"] = diff_time_ms(ptr_data->end_time, ptr_data->start_time); 
         latency["total_latency"] = ptr_data->total_latency;
         latency["min_latency"] = ptr_data->min_latency;
         latency["max_latency"] = ptr_data->max_latency;
@@ -202,7 +203,6 @@ int Bench::run() {
 
         root[currTestCase->case_name] = testCase; 
         root.toStyledString();
-        //cout << root.toStyledString() << std::endl;
     }
      
     //print total case status 
@@ -213,41 +213,4 @@ int Bench::run() {
     //write all json object to json file!
     file << root.toStyledString() << std::endl; 
     file.close();
-
-    //cout << root.toStyledString() << std::endl;
 }
-
-/*
-int main(int argc, const char *argv[])
-{
-    const char *user_name = "client.admin";
-    const char *cluster_name = "ceph";
-    Bench *benchInstance = Bench::getInstance(user_name, cluster_name);
-    //RbdAioBenchCase *rabc = new RbdAioBenchCase(); 
-    //  
-    librbd::Image *image = &(benchInstance->image);
-    string seqPattern = "seq";
-    string randPattern = "rand";
-    uint64_t ioBytes = 10240000;
-    uint64_t io_threads = 16;
-    AioWriteCase aw4kseq(string("aw4kseq"), image, 4096, io_threads, ioBytes, seqPattern);
-    AioWriteCase aw4krand(string("aw4krand"), image, 4096, io_threads, ioBytes, randPattern );
-    benchInstance->registerTestCase(&aw4kseq); 
-    benchInstance->registerTestCase(&aw4krand); 
-    
-    AioWriteCase aw8kseq(string("aw8kseq"), image, 8192, io_threads, ioBytes, seqPattern);
-    AioWriteCase aw8krand(string("aw8krand"), image, 8192, io_threads, ioBytes, randPattern );
-    benchInstance->registerTestCase(&aw8kseq); 
-    benchInstance->registerTestCase(&aw8krand); 
-    
-    AioWriteCase aw16kseq(string("aw16kseq"), image, 16384, io_threads, ioBytes, seqPattern);
-    AioWriteCase aw16krand(string("aw16krand"), image, 16384, io_threads, ioBytes, randPattern );
-    benchInstance->registerTestCase(&aw16kseq); 
-    benchInstance->registerTestCase(&aw16krand); 
-
-    benchInstance->run();
-    
-    free(benchInstance);
-    return 0;
-}
-*/

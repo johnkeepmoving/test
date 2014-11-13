@@ -21,20 +21,18 @@
 
 #include <rados/librados.hpp>
 #include <rbd/librbd.hpp>
-
-#include <common/config.h>
-#include <common/Cond.h>
-//#include <common/ceph_context.h>
-
+#include <sys/time.h>
+#include <unistd.h>
+#include <errno.h>
 #include <string>
 #include <iostream>
 #include <vector>
 
 using std::string;
-//using std::cin;
-//using std::cout;
-//using std::cerr;
-//using std::endl;
+using std::cin;
+using std::cout;
+using std::cerr;
+using std::endl;
 using std::vector;
 
 struct bench_interval_data {
@@ -42,14 +40,9 @@ struct bench_interval_data {
   double max_bandwidth;
 };
 
-struct bench_history {
-  vector<double> bandwidth;
-  vector<double> latency;
-};
-
 struct bench_data {
-  utime_t start_time; //start time for benchmark
-  utime_t end_time;   //end time for benchmark
+  timeval start_time; //start time for benchmark
+  timeval end_time;   //end time for benchmark
   bool done; //is the benchmark is done
   //int object_size; //the size of the objects
   //int trans_size; //size of the write/read to perform
@@ -63,8 +56,7 @@ struct bench_data {
   double variance_latency;
   double total_latency;
   //struct bench_interval_data idata; // data that is updated by time intervals and not by events
-  struct bench_history history; // data history, used to calculate stddev
-  utime_t cur_latency; //latency of last completed transaction
+  double cur_latency; //latency of last completed transaction
   //char *object_contents; //pointer to the contents written to each object
   bench_data() {
       done = false;
@@ -77,6 +69,8 @@ struct bench_data {
       variance_latency = 0.0;
   };
 };
+
+double diff_time_ms(timeval end_time, timeval start_time);
 
 class TestCase {
     public:

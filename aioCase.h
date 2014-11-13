@@ -19,12 +19,17 @@
 #ifndef AIO_CASE_H
 #define AIO_CASE_H
 
+#include <map>
 #include "testCase.h"
+#include <pthread.h> 
 #include <rados/buffer.h>
+using std::map;
+using librados::bufferlist;
+using ceph::bufferptr;
 struct aio_status {
-    utime_t start_time;
+    timeval start_time;
     bufferlist *buf;
-    aio_status(utime_t time, bufferlist *p):start_time(time), buf(p) {}
+    aio_status(timeval time, bufferlist *p):start_time(time), buf(p) {}
     aio_status() {}
 };
 
@@ -37,11 +42,10 @@ public:
     bool write;//determin if it's write or read
     //data is in TestCase
     librbd::Image *image;
-    Mutex lock;
-    Cond cond;
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
     //store every aio's start time
-    //map<librbd::RBD::AioCompletion*, utime_t> start_time;
-    map<librbd::RBD::AioCompletion*, aio_status> status;
+    map<librbd::RBD::AioCompletion*, struct aio_status> status;
     //the pointer to the member function of librbd::Image,
     AioCase(string caseName, bool ioWrite, uint64_t ioSize, uint64_t ioThreads, uint64_t ioBytes, string ioPattern, librbd::Image *pImage);
     ~AioCase();

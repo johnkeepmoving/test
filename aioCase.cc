@@ -20,22 +20,30 @@
 AioCase :: AioCase(string caseName, bool ioWrite, uint64_t ioSize, uint64_t ioThreads, 
         uint64_t ioBytes, string ioPattern, librbd::Image *pImage) 
     :TestCase(caseName), write(ioWrite), io_size(ioSize), io_threads(ioThreads), io_bytes(ioBytes), pattern(ioPattern), 
-    image(pImage), lock("AioCase::lock") {
+    image(pImage) {
         //cout << "Construct AioCase" << std::endl;
+        pthread_mutex_init(&lock, NULL);
+        pthread_cond_init(&cond, NULL);
 }
 
 AioCase :: ~AioCase() {
     //cout << "Destcut AioCase" << std::endl;
+    pthread_mutex_destroy(&lock);
+    pthread_cond_destroy(&cond);
 } 
 
 void AioCase::wait_for(int max) {
-    Mutex::Locker l(lock);
+    pthread_mutex_lock(&lock);
     while (data.in_flight > max) {
-        utime_t dur;
-        dur.set_from_double(.2);
-        //cond.WaitInterval(g_ceph_context, lock, dur);
-        cond.WaitInterval(NULL, lock, dur);
+        struct timespec outtime;
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        outtime.tv_sec = now.tv_sec;
+        outtime.tv_nsec = now.tv_usec * 1000 + 200000000;//wait for 200ms
+        //pthread_cond_timedwait(&cond, &lock, &outtime);
+        pthread_cond_wait(&cond, &lock);
     }
+    pthread_mutex_unlock(&lock);
 }
 bool AioCase::run()
 {
@@ -70,7 +78,8 @@ bool AioCase::run()
         start_pos = (rand() % (size / io_size)) * io_size;
         thread_offset.push_back(start_pos);
     }
-    data.start_time = ceph_clock_now(NULL);
+    gettimeofday(&data.start_time, NULL);
+    //data.start_time = ceph_clock_now(NULL);
     uint64_t off;
     for (off = 0; off < io_bytes; ) {
         //wait_for is from aioCase.h 
@@ -99,7 +108,8 @@ bool AioCase::run()
         //cerr << "Error flushing data at the end: " << cpp_strerror(r) << std::endl;
         cerr << "Error flushing data at the end: " << r << std::endl;
     }
-    data.end_time = ceph_clock_now(NULL);
+    //data.end_time = ceph_clock_now(NULL);
+    gettimeofday(&data.end_time, NULL);
     case_result = true; 
     //function from testCase.h
     //when finish all ops, print statistics
