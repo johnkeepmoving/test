@@ -1,3 +1,6 @@
+Because benchMark use the headers and libs of (json, yaml-cpp, rados, rbd), and the makefile of benchMark use the libs directly, 
+so we need to ensure program can find all these libs from system path, (/usr/include, /usr/lib/) 
+   -ljson_linux -lrados -lrbd -lyaml-cpp
 1. install yaml-cpp
    download yaml-cpp from https://code.google.com/p/yaml-cpp/downloads/detail?name=yaml-cpp-0.5.1.tar.gz
    install accroding to 'install.txt' 
@@ -24,4 +27,9 @@ scon is needed by jscon, so we should install scon first
    download from http://sourceforge.net/projects/jsoncpp/
    tar zxvf jsoncpp-src-0.5.0.tar.gz 
    cd jsoncpp-src-0.5.0
-   python $MYSCONS/script/scons platform=linux-gcc 
+   python $MYSCONS/script/scons platform=linux-gcc
+   cp -r include/json  /usr/include
+   
+   ** my gcc version is 4.4.7, so repalce it with your gcc version **
+   cp libs/linux-gcc-4.4.7/*  /usr/lib/
+   ln -s /usr/lib/libjson_linux-gcc-4.4.7_libmt.so /usr/lib/libjson_linux
